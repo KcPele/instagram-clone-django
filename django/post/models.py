@@ -4,18 +4,20 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.utils.text import slugify
 from django.urls import reverse
+import uuid
 
 def user_directory_path(instance, filename):
     #this file will be uploaded to media root /user(id)/fiename
     return f'user_{instance.user.id}/{filename}'
 
 
+#for tages
 class Tag(models.Model):
     title = models.CharField(max_length=75, verbose_name='Tag')
     slug = models.SlugField(null=False, unique=True)
 
     class Meta:
-        verbose_name_plural = _("Tags")
+        verbose_name_plural = ("Tags")
 
     def __str__(self):
         return self.title
@@ -28,23 +30,24 @@ class Tag(models.Model):
             self.slug = slugify(self.title)
         
         return super().save(*args, **kwargs)
+       
 
 class Post(models.Model):
-    id = models.UUIDField(primary_key=True, default=models.UUIDField4, editable=Fasle)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     picture = models.ImageField(upload_to=user_directory_path, null=False, verbose_name='Picture')
     caption = models.TextField(max_length=1500, verbose_name='Caption')
-    posted = models.DateTimeFiels(auto_now_add=True)
-    tags = models.ManyToManyField(Tags, related_name='tags')
+    posted = models.DateTimeField(auto_now_add=True)
+    tags = models.ManyToManyField(Tag, related_name='tags')
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     likes = models.IntegerField()
     
 
     class Meta:
-        verbose_name = _("Post")
-        verbose_name_plural = _("Posts")
+        verbose_name = ("Post")
+        verbose_name_plural = ("Posts")
 
     def __str__(self):
-        return self.posted
+        return str(self.posted)
 
     def get_absolute_url(self):
         return reverse("postdetails", args=[str(self.id)])
@@ -67,7 +70,10 @@ class Stream(models.Model):
         user = post.user
         followers = Follow.objects.all().filter(following=user)
         for follower in followers:
-            stream = Stream(post=psot, user=follower.follower, date=post.posted, following=user)
+            stream = Stream(post=post, user=follower.follower, date=post.posted, following=user)
             stream.save()
 
-    
+
+#this will happen each time we make a post
+#each time there is a post it will create a stream because the sender is post
+post_save.connect(Stream.add_post, sender=Post)

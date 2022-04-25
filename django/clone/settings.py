@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'authy',
+    'post'
 ]
 
 MIDDLEWARE = [
@@ -112,7 +113,11 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-CSRF_TRUSTED_ORIGINS = ['https://8000-kcpele-instagramcloned-6k78agql9ke.ws-eu38.gitpod.io']
+
+CSRF_TRUSTED_ORIGINS = ['https://8000-kcpele-instagramclonedj-dxcoyv10c16.ws-eu42.gitpod.io']
+
+
+# CSRF_COOKIE_DOMAIN = '.8000-kcpele-instagramcloned-6k78agql9ke.ws-eu38.gitpod.io'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
